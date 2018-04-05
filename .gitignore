@@ -1,0 +1,3 @@
+.iu_zsh.iml
+**/.idea/*
+!**/.idea/runConfigurations
