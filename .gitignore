@@ -1,3 +1,19 @@
-.iu_zsh.iml
-**/.idea/*
-!**/.idea/runConfigurations
+## Gradle
+/.gradle/
+/build/
+/out/
+*/out/
+
+## File Types
+*.bak
+*.log
+
+## IDEA
+/iu-org-service.iml
+/.idea/workspace.xml
+
+## VS Code
+/.vscode/*
+
+## Custom
+/post-zsh/env/*
