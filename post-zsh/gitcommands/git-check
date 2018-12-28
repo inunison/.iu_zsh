@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -e
+
+# List repositories
+repos=$(find . -name ".git" -maxdepth 2 | sed 's/^\.\/\(.*\)\/\.git$/\1/')
+
+# Find longest repository name
+longestName=0
+while read -r repo; do
+    nameLength=${#repo}
+    if (( nameLength > longestName )); then
+        longestName=$nameLength
+    fi
+done <<< "$repos"
+
+error=0
+while read -r repo; do
+
+    nameLength=${#repo}
+    cd ${repo}
+
+    status="OK"
+
+    currentBranch=$(git branch | grep \* | cut -d ' ' -f2-)
+
+    if [ ! git fetch &> /dev/null ]; then
+        error=1
+        status="Fetch failed"
+
+    elif \
+            [ -f .gitbranches ] && [ ! $(cat .gitbranches | grep -x $currentBranch) ] \
+            || [ ! -f .gitbranches ] && [[ $currentBranch != master ]]
+    then
+        error=1
+        status="Not on master branch"
+
+    elif [[ -n $(git status -s) ]]; then
+        error=1
+        status="Not clean"
+
+    elif \
+            [ -f .gitbranches ] && [ $(cat .gitbranches | wc -l) != $(git branch | wc -l) ] \
+            || [ ! -f .gitbranches ] && [ 1 != $(git branch | wc -l) ]
+    then
+        error=1
+        status="Stale branches"
+
+    elif [ 0 != $(git stash list | wc -l) ]; then
+        error=1
+        status="Stashes exist"
+
+    fi
+
+    if [ "$status" != "OK" ]; then
+        echo -n "$repo"
+        printf ' %.0s' $(seq 1 $(( longestName - nameLength + 1 )))
+        echo -n "| $status"
+        echo ""
+    fi
+
+    cd ..
+
+done <<< "$repos"
+
+if [ $error -eq 0 ]; then
+    echo "All OK"
+fi
+exit $error
