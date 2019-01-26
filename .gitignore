@@ -3,8 +3,13 @@
 *.log
 
 ## IDEA
-/iu-org-service.iml
-/.idea/workspace.xml
+/.idea/*
+!/.idea/encodings.xml
+!/.idea/misc.xml
+!/.idea/modules.xml
+!/.idea/runConfigurations/
+!/.idea/vcs.xml
+!/.idea/iu_zsh.iml
 
 ## VS Code
 /.vscode/*
